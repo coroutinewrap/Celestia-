@@ -1,0 +1,685 @@
+-- created by shush#8272 / Paupxx XD
+
+--[[ Settings ]]--
+
+local title = "Decadence 1.0.4 | shush#8272"  -- Name Gui
+local theme = "Dark" -- Themes: https://raw.githubusercontent.com/gageontop/Themes/main/names.txt
+
+--[[
+
+Themes:
+"Light",
+"Dark",
+"Mocha",
+"Aqua",
+"Jester",
+--]]
+-- -- -- -- -- -- --
+
+
+
+-- Load Gui
+local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
+local UI = Material.Load({
+	Title = title,
+	Style = 1,
+	SizeX = 450,
+	SizeY = 300,
+	Theme = theme
+})
+
+local FTIEnabled = true
+local FTISize = 0
+local DMGAMP = true
+local TEAMCHECK = true
+local dmgampa = 1
+local fasttick = 0.05
+local t = tick()
+local lungeonly = true
+local target = nil
+local keyframe = nil
+local framedistance = 15
+local vis = true
+local frameenabled = true
+local transparencycheck = true
+local keyac = nil
+local acenabldebind = false
+--------------------------
+-- Page Inserts
+local PageFTI = UI.New({
+	Title = "FTI"
+})
+
+local PageFTIW = UI.New({
+	Title = "FTI Whitelist"
+})
+
+local PageVis = UI.New({
+	Title = "Visualizer"
+})
+
+local PageBypasses = UI.New({
+	Title = "Bypasses"
+})
+
+local PageAC = UI.New({
+	Title = "Autoclicker"
+})
+
+local PageFrame = UI.New({
+	Title = "Frame"
+})
+
+--------------------------
+-- Info Inserts
+local InfoText = PageFTI.Label({
+	Text = "FireTouchInterest Page",
+})
+
+local InfoText = PageFrame.Label({
+	Text = "Frame people using FTI",
+})
+--------------------------
+-- Page Codes
+
+local ac = true
+local acb = true
+
+local hook1 = false 
+local hook2 = false
+local hook3 = false
+local hook4 = false
+local hook5 = false
+local hook6 = false
+local whitelisted = {}
+
+--// whitelist fti section l0l
+
+local TextField = PageFTIW.TextField({
+	Text = "Whitelist Player",
+	Callback = function(value)
+	    if tostring(value) == game:GetService("Players").LocalPlayer then return end
+		if value == " " or value == "" then
+		    return
+		else
+		    table.insert(whitelisted, tostring(value))
+		end
+	end,
+})
+
+local z = PageFTIW.TextField({
+	Text = "Un-Whitelist Player",
+	Callback = function(value)
+	    if tostring(value) == game:GetService("Players").LocalPlayer then return end
+		if value == " " or value == "" then
+		    return
+		else
+		    if table.find(whitelisted, tostring(value)) then
+		       table.remove(whitelisted, table.find(whitelisted, tostring(value)))
+		       ----print(value .. " was removed from the whitelist table")
+		    end
+		end
+	end,
+})
+
+local Button = PageFTIW.Button({
+	Text = "Clear Whitelist",
+	Callback = function(value)
+		table.clear(whitelisted)
+	end,
+})
+
+--/ the funny frame
+local ToggleButton443 = PageFrame.Toggle({
+	Text = "Frame Enabled",
+	Callback = function(value)
+	    frameenabled = value
+	end,
+})
+
+local TextField = PageFrame.TextField({
+	Text = "Player/Display Name",
+	Callback = function(value)
+	    if tostring(value) == game:GetService("Players").LocalPlayer then return end
+		if value == " " or value == "" then
+		    target = nil
+		else
+		    target = value
+		end
+	 
+	 --print(tostring(target))
+	end,
+})
+
+local TextField = PageFrame.TextField({
+	Text = "Frame Keybind",
+	Callback = function(value)
+	    if string.len(value) == 1 then
+	    keyframe = string.upper(value)
+	    --print(keyframe)
+	    end
+	end,
+})
+
+local Slider1 = PageFrame.Slider({
+	Text = "Frame Max Distance",
+	Callback = function(value)
+		framedistance = value
+	end,
+	Min = 0,
+	Max = 10000000000000000000,
+	Def = 15
+})
+
+game:GetService("UserInputService").InputBegan:Connect(function(key, chat)
+    if chat then return end
+    if keyac ~= nil then
+       if key.KeyCode == Enum.KeyCode[keyac] then
+          acenabldebind = not acenabldebind 
+       end
+    end
+end)
+
+game:GetService("UserInputService").InputBegan:Connect(function(key, chat)
+    if chat then return end
+    if keyframe ~= nil and target ~= nil and frameenabled == true then
+    if key.KeyCode == Enum.KeyCode[keyframe] then
+        for i,v in pairs(game:GetService('Players'):GetPlayers()) do
+            if v ~= game:GetService("Players").LocalPlayer then
+                if string.lower(v.Name) == string.lower(tostring(target)) or string.lower(v.DisplayName) == string.lower(tostring(target)) then
+                    if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health ~= 0 then
+                        local mag = (v.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                        if mag <= framedistance then
+                        if v.Character:FindFirstChildOfClass("Tool") then
+                            if v.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle") then
+                                local Handle = v.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle")
+                                if game:GetService("Players").LocalPlayer.Character then
+                                    for i2,v2 in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
+                                        if v2:IsA('Part') then
+                                            for i = 1, 15 do
+                                                firetouchinterest(v.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle"), v2, 0)
+                                                firetouchinterest(v.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle"), v2, 1)
+                                                firetouchinterest(v.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle"), v2, 0)
+                                                firetouchinterest(v.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle"), v2, 1)
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- hooks / bypasses
+local ToggleButton4 = PageBypasses.Toggle({
+	Text = "Hook GetTouchingParts()",
+	Callback = function(value)
+	    hook1 = value
+	    local hook; hook = hookmetamethod(game, "__index", function(self, key)
+            if not checkcaller() and tostring(key):find("GetTouchingParts") and hook1 then
+                return
+                end
+            return hook(self, key)
+        end)
+
+	    local hookc; hookc = hookmetamethod(game, "__namecall", function(...)
+	        if not checkcaller() and hook1 then
+	            local args = {...}
+	            local name = getnamecallmethod()
+	            if tostring(name):find("GetTouchingParts") then
+	               return
+	            end
+	        end
+            return hookc(...)
+        end)
+	end,
+})
+
+
+local ToggleButton4 = PageBypasses.Toggle({
+	Text = "Hook GetPartsInPart()",
+	Callback = function(value)
+	    hook2 = value
+	    local hooka; hooka = hookmetamethod(game, "__index", function(self, key)
+            if not checkcaller() and tostring(key):find("GetPartsInPart") and hook2 then
+                return
+                end
+            return hooka(self, key)
+	    end)
+    
+	    local hook; hook = hookmetamethod(game, "__namecall", function(self, ...)
+	        if not checkcaller() then
+	            local args = {...}
+	            local name = getnamecallmethod()
+	            
+	            if hook2 then
+	            if tostring(name):find("GetPartsInPart") then
+	               return
+	            end
+	        end
+        end
+	return hook(self, ...)
+end)
+	end,
+})
+
+local ToggleButton4 = PageBypasses.Toggle({
+	Text = "Hook ArePartsTouchingOthers()",
+	Callback = function(value)
+	    hook3 = value
+	    local hookaf; hookaf = hookmetamethod(game, "__index", function(self, key)
+            if not checkcaller() and tostring(key):find("ArePartsTouchingOthers") and hook3 then
+                return
+                end
+            return hookaf(self, key)
+	    end)
+    
+	    local hook; hook = hookmetamethod(game, "__namecall", function(self, ...)
+	        if not checkcaller() then
+	            local args = {...}
+	            local name = getnamecallmethod()
+	            
+	            if hook3 then
+	            if tostring(name):find("ArePartsTouchingOthers") then
+	               return
+	            end
+	        end
+        end
+	return hook(self, ...)
+end)
+	end,
+})
+
+local ToggleButton4 = PageBypasses.Toggle({
+	Text = "Hook GetPartBoundsInBox()",
+	Callback = function(value)
+	    hook4 = value
+	    local hookafz; hookafz = hookmetamethod(game, "__index", function(self, key)
+            if not checkcaller() and tostring(key):find("GetPartBoundsInBox") and hook4 then
+                return wait(9e9)
+                end
+            return hookafz(self, key)
+	    end)
+	    
+	    local hook; hook = hookmetamethod(game, "__namecall", function(self, ...)
+	        if not checkcaller() then
+	            local args = {...}
+	            local name = getnamecallmethod()
+	            
+	            if hook4 then
+	            if tostring(name):find("GetPartBoundsInBox") then
+	               return
+	            end
+	        end
+        end
+	return hook(self, ...)
+end)
+	end,
+})
+	    
+	   
+	    
+    
+local ToggleButton4 = PageBypasses.Toggle({
+	Text = "Hook GetPartBoundsInRadius()",
+	Callback = function(value)
+	    hook5 = value
+	    local hookacfz; hookacfz = hookmetamethod(game, "__index", function(self, key)
+            if not checkcaller() and tostring(key):find("GetPartBoundsInRadius") and hook5 then
+                return
+                end
+            return hookacfz(self, key)
+	    end)
+    
+	    local hook; hook = hookmetamethod(game.Players.LocalPlayer, "__namecall", function(self, ...)
+	        if not checkcaller() then
+	            local args = {...}
+	            local name = getnamecallmethod()
+	            
+	            if hook5 then
+	            if tostring(name):find("GetPartBoundsInRadius") then
+	               return
+	            end
+	        end
+        end
+	        return hook(self, ...)
+	    end)
+	end,
+})
+
+-- AC
+local ToggleButton4 = PageAC.Toggle({
+	Text = "AutoClicker",
+	Callback = function(value)
+		if ac == false then
+		    ac = true
+		else
+		    ac = false
+		end
+	end,
+})
+
+local TextField = PageAC.TextField({
+	Text = "AC Toggle Bind",
+	Callback = function(value)
+	    if string.len(value) == 1 then
+	    keyac = string.upper(value)
+	    --print(keyframe)
+	    end
+	end,
+})
+
+local tainted = {"ac", "autoclicking", "autoclick", "not allowed", "autoclicker"}
+local ToggleButton4 = PageAC.Toggle({
+	Text = "AutoClicker Bypass",
+	Callback = function(value)
+	    acb = value
+	    
+	    spawn(function()
+	        while task.wait() do
+	            pcall(function()
+	                game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle:FindFirstChildOfClass("LocalScript"):Destroy()
+	            end)
+	            if acb == false then break end
+	        end
+	    end)
+        
+	end,
+})
+
+
+
+local ab = false
+local function newvis(s)
+    local p = Instance.new('Part')
+    p.Shape = "Ball"
+    p.Transparency = 0.7
+    p.Color = Color3.new(0,0,0) or Color3.fromRGB(0,0,0)
+    p.Anchored = true
+    p.CanCollide = false
+    p.CanTouch = false
+    p.Name = "-"
+    p.Parent = nil
+    ab = true
+    return p
+end
+
+local ToggleButton4 = PageVis.Toggle({
+	Text = "Visualizer",
+	Callback = function(value)
+	    vis = value
+	    --print(tostring(vis) .. " vis")
+	end,
+})
+
+-- FTI
+local ToggleButton2 = PageFTI.Toggle({
+	Text = "FTI Enabled",
+	Callback = function(value)
+		if FTIEnabled == false then
+		    FTIEnabled = true
+		    --print('fti true')
+		else
+		    FTIEnabled = false
+		    --print("fti false")
+		    end
+	end,
+})
+
+local ToggleButton1 = PageFTI.Toggle({
+	Text = "DMG Amp",
+	Callback = function(value)
+		if DMGAMP == false then
+		    DMGAMP = true
+		    --print('DMGAMP true')
+		else
+		    DMGAMP = false
+		    --print("DMGAMP false")
+		    end
+	end,
+})
+
+local TextField4 = PageFTI.TextField({
+	Text = "Specific Size",
+	Callback = function(value)
+	    if tonumber(value) then
+	        FTISize = tonumber(value)
+	        --print(tostring(value) .. " value " .. tostring(FTISize) .. " fti size")
+	   else
+	       FTISize = 0
+	       --print("returned nil")
+	        end
+	end,
+})
+
+local Slider1 = PageFTI.Slider({
+	Text = "Size",
+	Callback = function(value)
+		FTISize = value
+		--print(FTISize)
+	end,
+	Min = 0,
+	Max = 300,
+	Def = 0
+})
+
+local Slider2 = PageFTI.Slider({
+	Text = "Dmg Amp",
+	Callback = function(value)
+	    dmgampa = value
+	end,
+	Min = 1,
+	Max = 15,
+	Def = 1
+})
+
+local ToggleButton1 = PageFTI.Toggle({
+	Text = "Lunge Only",
+	Callback = function(value)
+	    lungeonly = value
+	end,
+})
+
+local ToggleButton4 = PageFTI.Toggle({
+	Text = "Fast Tick",
+	Callback = function(value)
+	    if value == true then
+	        fasttick = 0.01
+	    elseif value == false then
+	        fasttick = 0.05
+	   end
+	end,
+
+})
+
+local ToggleButton3 = PageFTI.Toggle({
+	Text = "Team Check",
+	Callback = function(value)
+		if TEAMCHECK == false then
+		    TEAMCHECK = true
+		    --print('TEAMCHECK true')
+		else
+		    TEAMCHECK = false
+		    --print("TEAMCHECK false")
+		    end
+	end,
+
+})
+
+local ToggleButton1 = PageFTI.Toggle({
+	Text = "Transparency Check",
+	Callback = function(value)
+	    transparencycheck = value
+	end,
+})
+
+
+local player = game:GetService("Players").LocalPlayer
+
+local IsTeam = function(Player)
+    if Player.Team == game:GetService("Players").LocalPlayer.Team then
+        return true
+    else 
+        return false
+    end
+end
+
+local FTI = function(handle, hit)
+    if hit.Parent.Name == game:GetService("Players").LocalPlayer.Name then return end
+    local Humanoid = hit.Parent:FindFirstChild("Humanoid")
+    if hit.Parent:FindFirstChildOfClass("ForceField") then return end
+    if Humanoid then
+        if Humanoid.Health > 0 or Humanoid.Health ~= 0 then
+            if DMGAMP == true then
+                for i,v in pairs(hit.Parent:GetChildren()) do
+                    if v:IsA("Part") and not v:FindFirstChildOfClass("TouchTransmitter") then
+                        for i = 1, dmgampa do
+                        firetouchinterest(v, handle, 0)
+                        firetouchinterest(v, handle, 1)
+                        end
+                    end
+                end
+        else
+            --print('false')
+            for i,v in pairs(hit.Parent:GetChildren()) do
+                if v:IsA("Part") and not v:FindFirstChildOfClass("TouchTransmitter") then
+                    if math.abs(tick() - t) < 0.05 or math.abs(tick() - t) < 0.045 then return end
+                        t = tick()
+                        firetouchinterest(v, handle, 0)
+                        firetouchinterest(v, handle, 1)
+                    end
+                end
+            end
+            end
+        end
+    end
+
+local visp = newvis()
+game:GetService("RunService").RenderStepped:Connect(function()
+    if FTIEnabled == true then
+    local Tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+    if Tool then
+    local Handle = Tool:FindFirstChild("Handle")
+    if vis == true then
+           if Handle then
+            visp.Anchored = false
+            visp.Size = Vector3.new(FTISize, FTISize, FTISize)
+            visp.Parent = workspace
+            visp.CFrame = Handle.CFrame
+        else
+            visp.Parent = nil
+            visp.Anchored = true
+            visp.Size = Vector3.new(FTISize, FTISize, FTISize)
+        end
+    end
+    if Handle then
+        if lungeonly == true then
+            if Tool.GripUp.Z == 0 then
+        for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+            if table.find(whitelisted, tostring(v)) or table.find(whitelisted, v.Name) or table.find(whitelisted, v.DisplayName) then return end
+            if v ~= player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+            if transparencycheck == true then if v.Torso.Transparency >= 0.7 then return end end
+            if TEAMCHECK == true then
+                if IsTeam(v) == false then
+                    local mag = (Handle.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                    if mag <= FTISize then
+                    FTI(Handle, v.Character.HumanoidRootPart)    
+                    end
+                end
+            else
+                for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+                    if table.find(whitelisted, tostring(v)) or table.find(whitelisted, v.Name) or table.find(whitelisted, v.DisplayName) then return end
+                    if v ~= player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                        if transparencycheck == true then if v.Torso.Transparency >= 0.7 then return end end
+                        local mag = (Handle.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                        if mag <= FTISize then
+                            FTI(Handle, v.Character.HumanoidRootPart)
+                        end
+                    end
+                end
+            end
+        end
+            end
+            end
+    elseif lungeonly == false then
+    for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+        if table.find(whitelisted, tostring(v)) or table.find(whitelisted, v.Name) or table.find(whitelisted, v.DisplayName) then return end
+            if v ~= player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                if transparencycheck == true then if v.Torso.Transparency >= 0.7 then return end end
+            if TEAMCHECK == true then
+                if IsTeam(v) == false then
+                    local mag = (Handle.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                    if mag <= FTISize then
+                    FTI(Handle, v.Character.HumanoidRootPart)    
+                    end
+                end
+            else
+                for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+                    if table.find(whitelisted, tostring(v)) or table.find(whitelisted, v.Name) or table.find(whitelisted, v.DisplayName) then return end
+                    if v ~= player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                        if transparencycheck == true then if v.Torso.Transparency >= 0.7 then return end end
+                        local mag = (Handle.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                        if mag <= FTISize then
+                            FTI(Handle, v.Character.HumanoidRootPart)
+                        end
+                    end
+                end
+            end
+        end
+            end
+        end
+end
+end
+end
+    if ac == true then
+        if keyac == nil then
+    local Tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+    if Tool and player.Character.Humanoid.Health ~= 0 then
+        Tool:Activate()
+    end
+    else
+        if acenabldebind then
+    local Tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+    if Tool and player.Character.Humanoid.Health ~= 0 then
+        Tool:Activate()
+    end
+        end
+end
+    end
+end)
+
+local h; h = hookmetamethod(game, "__namecall", function(...)
+    if not checkcaller() then
+        local a = {...}
+        local g = getnamecallmethod()
+        if tostring(g) == "GetLogHistory" then
+           return nil 
+        end
+    end
+    return h(...)
+end)
+
+for i, v in next, getconnections(game:GetService("LogService").MessageOut) do
+       v:Disable()
+       v.Function = print
+end
+
+for i, v in next, getconnections(game:GetService("ScriptContext").Error) do
+       v:Disable()
+       v.Function = print
+end
+--------------------------
+-- Toggle Gui
+game:GetService("UserInputService").InputBegan:connect(function(inp,gpe)
+	if gpe then return end
+	if inp.KeyCode == Enum.KeyCode.X then
+		game:GetService("CoreGui")[title].Enabled = not game:GetService("CoreGui")[title].Enabled
+	end
+end)
+-----------------------------
