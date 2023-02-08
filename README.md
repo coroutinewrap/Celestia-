@@ -1,2 +1,2 @@
 # Celestia-
-A script made for Deepwoken/Other games made by shock#6534 and shush#4041
+A script made for Deepwoken/Other games made by shock#2500 and paup#5128
